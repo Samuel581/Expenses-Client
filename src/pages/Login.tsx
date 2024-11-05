@@ -1,4 +1,3 @@
-'use client'
 
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
@@ -19,25 +18,18 @@ export default function Component() {
     setError('')
     setLoading(true)
 
-    // Basic validation
     if (!email || !password) {
       setError('Please fill in all fields')
       setLoading(false)
       return
     }
 
-    // Mock login function
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500))
-      
-      // For demo purposes, always "succeed" unless the password is "wrongpassword"
       if (password === 'wrongpassword') {
         throw new Error('Invalid credentials')
       }
-
       console.log('Login successful')
-      // Here you would typically set the user in your app's state or context
     } catch (err) {
       setError('Invalid email or password')
     } finally {
@@ -46,8 +38,8 @@ export default function Component() {
   }
 
   return (
-    <div className="min-h-screen w-screen flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500 p-4">
-      <Card className="w-full max-w-md">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-500 to-pink-500 p-4">
+      <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>
           <CardDescription className="text-center">Enter your email to sign in to your account</CardDescription>

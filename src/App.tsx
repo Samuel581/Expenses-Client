@@ -1,4 +1,4 @@
-import HelloReact from './pages/HelloReact'
+//import HelloReact from './pages/HelloReact'
 import Login from './pages/Login'
 
 function App() {
