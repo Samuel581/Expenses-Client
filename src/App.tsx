@@ -1,11 +1,11 @@
-import './App.css'
 import HelloReact from './pages/HelloReact'
+import Login from './pages/Login'
 
 function App() {
 
   return (
     <div className='App'>
-      <HelloReact/>
+      <Login/>
     </div>
   )
 }
