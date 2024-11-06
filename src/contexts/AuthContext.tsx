@@ -1,14 +1,7 @@
-import { createContext, useState, ReactNode } from "react";
+import { useState, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import apiClient from "@/api/axiosClient";
-
-interface AuthContextType {
-  token: string | null;
-  login: (email: string, password: string) => void;
-  logout: () => void;
-}
-// We create a context with the AuthContextType interface as the value type.
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+import { AuthContext } from "./authContextDefinition";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(
