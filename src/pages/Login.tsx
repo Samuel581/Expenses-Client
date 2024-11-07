@@ -6,8 +6,10 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { LockIcon, MailIcon, AlertCircle } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
 
 export default function Component() {
+  const {login} = useAuth();
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -25,20 +27,22 @@ export default function Component() {
     }
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      if (password === 'wrongpassword') {
-        throw new Error('Invalid credentials')
-      }
+      await login(email, password);
       console.log('Login successful')
     } catch (err) {
-      setError('Invalid email or password')
+      if(err instanceof Error){
+        setError(err.message)
+      }
+      else{
+        setError("Aun unknow error has ocurred");
+      }
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-500 to-pink-500 p-4">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-500 to-blue-500 p-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>
@@ -73,14 +77,13 @@ export default function Component() {
                 <LockIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   id="password"
-                  type="password"
+                  type="text"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10"
                 />
               </div>
             </div>
-            // Conditional rendering for error message
             {error && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
@@ -90,7 +93,6 @@ export default function Component() {
             )}
           </CardContent>
           <CardFooter>
-            // Conditional rendering for loading state
             <Button className="w-full" type="submit" disabled={loading}>
               {loading ? 'Signing in...' : 'Sign in'}
             </Button>
