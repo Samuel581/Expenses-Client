@@ -13,7 +13,7 @@ import {
   TableRow,
   TableBody,
   TableCell,
-  TableFooter
+  TableFooter,
 } from "@/components/ui/table";
 
 import {
@@ -66,14 +66,21 @@ const Expenses = () => {
   const [amount, setAmount] = useState("");
   const [total, setTotal] = useState<number>(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const {logout} = useAuth();
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null); // Holds the expense being edited
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false); // Controls the edit dialog visibility
+  const { logout } = useAuth();
 
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
         const response = await apiClient.get("/expense"); // API call to fetch expenses
         setExpenses(response.data);
-        setTotal(response.data.reduce((acc: number, expense: Expense) => acc + expense.amount, 0));
+        setTotal(
+          response.data.reduce(
+            (acc: number, expense: Expense) => acc + expense.amount,
+            0
+          )
+        );
       } catch (err) {
         if (err instanceof Error) {
           setError(err.message);
@@ -113,16 +120,41 @@ const Expenses = () => {
 
   const handleLogout = async () => {
     try {
-      await logout()
+      await logout();
     } catch (error) {
-      if(error instanceof Error) setError(error.message);
-      
+      if (error instanceof Error) setError(error.message);
     }
-  }
+  };
+
+  const handleEdit = (expense: Expense) => {
+    setEditingExpense(expense); // Set the selected expense for editing
+    setDescription(expense.description);
+    setCategory(expense.category);
+    setDate(new Date(expense.expenseDate)); // Convert date to Date object
+    setAmount(expense.amount.toString()); // Convert amount to string for input
+    setIsEditDialogOpen(true); // Open the dialog
+  };
+
+  const handleDelete = async (id: string) => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this expense?"
+    );
+    if (!confirmed) return; // Exit if user cancels
+
+    try {
+      await apiClient.delete(`/expense/${id}`);
+      setExpenses((prev) => prev.filter((expense) => expense.id !== id)); // Remove expense from state
+    } catch (error) {
+      console.error("Failed to delete expense:", error);
+      setError("Failed to delete expense.");
+    }
+  };
 
   return (
     <div className="w-screen min-h-screen">
-      <h1 className="text-2xl font-bold mb-4 text-center mt-10">Your Expenses</h1>
+      <h1 className="text-2xl font-bold mb-4 text-center mt-10">
+        Your Expenses
+      </h1>
 
       {error && <p className="text-red-500">{error}</p>}
       <div className="px-auto mx-10">
@@ -217,7 +249,9 @@ const Expenses = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-        <Button variant={"destructive"} className="mr-0" onClick={handleLogout}>Logout</Button>
+        <Button variant={"destructive"} className="mr-0" onClick={handleLogout}>
+          Logout
+        </Button>
         <Table className="mt-10">
           <TableCaption>A list of your recent expenses.</TableCaption>
           <TableHeader>
@@ -240,20 +274,34 @@ const Expenses = () => {
                 <TableCell>
                   <Badge variant="default">{expense.category}</Badge>
                 </TableCell>
-                <TableCell className="text-center text-green-600 font-semibold">${expense.amount}</TableCell>
+                <TableCell className="text-center text-green-600 font-semibold">
+                  ${expense.amount}
+                </TableCell>
                 <TableCell className="flex flex-row gap-10">
-                  <Button variant={"default"} className="w-full"><FilePenLine/></Button>
-                  <Button variant={"destructive"} className="w-full"><Trash2/></Button>
+                  <Button variant={"default"} className="w-full">
+                    <FilePenLine />
+                  </Button>
+                  <Button
+                    variant={"destructive"}
+                    className="w-full"
+                    onClick={() => handleDelete(expense.id)}
+                  >
+                    <Trash2 />
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
           <TableFooter></TableFooter>
-            <TableRow>
-              <TableCell colSpan={4} className="font-semibold">Total</TableCell>
-              <TableCell className="text-center text-green-600 font-semibold">${total}</TableCell>
-              <TableCell></TableCell>
-            </TableRow>
+          <TableRow>
+            <TableCell colSpan={4} className="font-semibold">
+              Total
+            </TableCell>
+            <TableCell className="text-center text-green-600 font-semibold">
+              ${total}
+            </TableCell>
+            <TableCell></TableCell>
+          </TableRow>
         </Table>
       </div>
     </div>
