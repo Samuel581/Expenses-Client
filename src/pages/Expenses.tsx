@@ -9,16 +9,6 @@ import {
   Trash2,
 } from "lucide-react";
 //import { Card, CardContent, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableHeader,
-  TableCaption,
-  TableHead,
-  TableRow,
-  TableBody,
-  TableCell,
-  TableFooter,
-} from "@/components/ui/table";
 
 import {
   Dialog,
@@ -52,7 +42,6 @@ import {
   getFilteredRowModel,
   getSortedRowModel,
   ColumnDef,
-  flexRender,
   SortingState,
   ColumnFiltersState,
 } from "@tanstack/react-table";
@@ -64,6 +53,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 import { useAuth } from "@/hooks/useAuth";
+
+import ExpenseTable from "@/components/Expenses/ExpenseTable";
 
 interface Expense {
   id: string;
@@ -573,62 +564,7 @@ const Expenses = () => {
             Logout
           </Button>
         </div>
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-          <TableFooter></TableFooter>
-          <TableRow>
-            <TableCell colSpan={4} className="font-semibold">
-              Total
-            </TableCell>
-            <TableCell className="text-center text-green-600 font-semibold">
-              ${total.toFixed(2)}
-            </TableCell>
-            <TableCell></TableCell>
-          </TableRow>
-        </Table>
+        <ExpenseTable table={table} columns={columns} total={total}/>
       </div>
     </div>
   );
